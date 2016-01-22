@@ -103,13 +103,13 @@ bundle common va
       "rudder_var"     string => "/data/rudder";
 
     !windows::
-      "ncf_path"       string => "${rudder_var}/ncf";
+      "ncf_path"       string => "${rudder_var}/configuration-repository/ncf.d";
       "rudder_tools"   string => "${rudder_var}/tools";
 
     windows::
       "rudder_base"    string => "${sys.winprogdir}\Rudder";
       "rudder_tools"   string => "${rudder_base}\sbin";
-      "ncf_path"       string => "${rudder_base}\ncf";
+      "ncf_path"       string => "${rudder_base}\configuration-repository\ncf.d";
 
     !windows::
 

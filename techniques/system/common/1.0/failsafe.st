@@ -60,7 +60,7 @@ bundle common g
       "rudder_sbin"              string => "${rudder_base}/sbin";
       "rudder_base_sbin"         string => "${rudder_base}/sbin"; #folder where tools are installed
       "rudder_tools"             string => "${rudder_var}/tools";
-      "rudder_ncf"               string => "${rudder_var}/ncf";
+      "rudder_ncf"               string => "${rudder_var}/configuration-repository/ncf.d";
 
 &if(NOVA)&
     windows::
@@ -69,7 +69,7 @@ bundle common g
       "rudder_bin"               string => "${rudder_base}\bin";
       "rudder_sbin"              string => "${rudder_base}\sbin";
       "rudder_tools"             string => "${rudder_sbin}";
-      "rudder_ncf"               string => "${rudder_var}\ncf";
+      "rudder_ncf"               string => "${rudder_var}\configuration-repository\ncf.d";
 
       "rudder_tools_files_windows" slist => {
                                               # Rudder utilities
@@ -118,14 +118,13 @@ bundle common g
 
       "uuid"                     string => "&UUID&";
       "excludedreps"             slist  => { "\.X11", ".*kde.*", "\.svn", "perl" };
-      "ncf_local_excludedreps"    slist => { "50_techniques", @{g.excludedreps}};
+      "ncf_local_excludedreps"    slist => { "common/50_techniques", @{g.excludedreps}};
       "rudder_tools_origin"      string => "/var/rudder/tools";
-      "rudder_ncf_origin_common" string => "/usr/share/ncf/tree";
-      "rudder_ncf_origin_local"  string => "&CONFIGURATION_REPOSITORY_FOLDER&/ncf";
+      "rudder_ncf_common"        string => "${rudder_ncf}/common";
+      "rudder_ncf_local"         string => "${rudder_ncf}/local";
 
-      "rudder_ncf_hash_file"          string => "ncf_hash_file";
-      "rudder_ncf_origin_common_hash" string => "${rudder_ncf_origin_common}/${rudder_ncf_hash_file}";
-      "rudder_ncf_origin_local_hash"  string => "${rudder_ncf_origin_local}/${rudder_ncf_hash_file}";
+      "rudder_ncf_hash_file"     string => "ncf_hash_file";
+      "rudder_ncf_hash"          string => "${rudder_ncf}/${rudder_ncf_hash_file}";
 
       "rudder_tools_updated_origin" string => "${rudder_tools_origin}/rudder_tools_updated";
       "rudder_tools_updated"        string => "${rudder_tools}/rudder_tools_updated";

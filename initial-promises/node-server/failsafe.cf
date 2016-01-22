@@ -63,7 +63,7 @@ bundle common g
       "rudder_sbin"              string => "${rudder_base}/sbin";
       "rudder_base_sbin"         string => "${rudder_base}/sbin"; #folder where tools are installed
       "rudder_tools"             string => "${rudder_var}/tools";
-      "rudder_ncf"               string => "${rudder_var}/ncf";
+      "rudder_ncf"               string => "${rudder_var}/configuration-repository/ncf.d";
       "uuid_file"                string => "${rudder_base}/etc/uuid.hive";
 
     windows::
@@ -72,7 +72,7 @@ bundle common g
       "rudder_var"               string => "${sys.winprogdir}\Rudder\var";
       "rudder_sbin"              string => "${rudder_base}\sbin";
       "rudder_tools"             string => "${rudder_sbin}";
-      "rudder_ncf"               string => "${rudder_var}\ncf";
+      "rudder_ncf"               string => "${rudder_var}\configuration-repository\ncf.d";
       "uuid_file"                string => "${rudder_base}\etc\uuid.hive";
 
       "rudder_tools_files_windows" slist => {
@@ -132,8 +132,8 @@ bundle common g
       "uuid"                     string => readfile("${g.uuid_file}", 60);
       "excludedreps"              slist => { "\.X11", ".*kde.*", "\.svn", "perl" };
       "rudder_tools_origin"      string => "/var/rudder/tools";
-      "rudder_ncf_origin_common" string => "/usr/share/ncf/tree";
-      "rudder_ncf_origin_local"  string => "/var/rudder/configuration-repository/ncf";
+      "rudder_ncf_common"        string => "${rudder_ncf}/common";
+      "rudder_ncf_local"         string => "${rudder_ncf}/local";
 
       "rudder_tools_updated_origin" string => "${rudder_tools_origin}/rudder_tools_updated";
       "rudder_tools_updated"        string => "${rudder_tools}/rudder_tools_updated";

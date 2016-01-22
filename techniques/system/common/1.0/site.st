@@ -52,7 +52,7 @@ bundle common g
       "uuid_file"                  string => "${rudder_base}/etc/uuid.hive";
       "rudder_disable_agent_file"  string => "${rudder_base}/etc/disable-agent";
       "rudder_tools"               string => "${rudder_var}/tools";
-      "rudder_ncf"                 string => "${rudder_var}/ncf";
+      "rudder_ncf"                 string => "${rudder_configuration_repository}/ncf.d";
       "crontab"                    string => "/etc/crontab";
       "gzip"                       string => "/bin/gzip";
 
@@ -66,7 +66,7 @@ bundle common g
       "rudder_inventories"         string => "${rudder_var}\inventories";
       "rudder_base_sbin_arg"       string => "${sys.winprogdir}\Rudder\sbin"; # for the installer command line
       "rudder_tools"               string => "${rudder_sbin}";
-      "rudder_ncf"                 string => "${rudder_base}\ncf";
+      "rudder_ncf"                 string => "${rudder_configuration_repository}\ncf.d";
       "escaped_workdir"            string => escape("${sys.workdir}");
       "rudder_curl"                string => "\"${rudder_base_sbin}\curl\curl.exe\"";
       "uuid_file"                  string => "${rudder_base}\etc\uuid.hive";
@@ -100,12 +100,11 @@ bundle common g
       "rudder_configuration_repository"
                                     string => "&CONFIGURATION_REPOSITORY_FOLDER&";
 
-      "rudder_ncf_origin_common"    string => "/usr/share/ncf/tree";
-      "rudder_ncf_origin_local"     string => "${rudder_configuration_repository}/ncf";
+      "rudder_ncf_common"           string => "${rudder_ncf}/common";
+      "rudder_ncf_local"            string => "${rudder_ncf}/local";
 
-      "rudder_ncf_hash_file"          string => "ncf_hash_file";
-      "rudder_ncf_origin_common_hash" string => "${rudder_ncf_origin_common}/${rudder_ncf_hash_file}";
-      "rudder_ncf_origin_local_hash"  string => "${rudder_ncf_origin_local}/${rudder_ncf_hash_file}";
+      "rudder_ncf_hash_file"        string => "ncf_hash_file";
+      "rudder_ncf_hash"             string => "${rudder_ncf}/${rudder_ncf_hash_file}";
 
       "uncompressed_inventory_file_types" slist => { ".*.ocs" };
       "inventory_file_types"              slist => { "@{uncompressed_inventory_file_types}", ".*.gz" };
@@ -156,5 +155,5 @@ bundle common g
 # defines the path to the ncf configuration file
 bundle common ncf_configuration {
   vars:
-    "ncf_configuration_file" string => "${g.rudder_ncf}/local/ncf.conf";
+    "ncf_configuration_file" string => "${g.rudder_ncf_local}/ncf.conf";
 }

@@ -31,8 +31,7 @@ bundle agent propagatePromises
       "client_data" string => "${g.rudder_var}/share/";  #where to put the files on the client when downloaded
 
     pass2.root_server::
-      "ncf_common_sha_sum" string => execresult("${paths.path[find]} ${g.rudder_ncf_origin_common} -not -name ${g.rudder_ncf_hash_file} -type f -print0  | ${paths.path[sort]} -z | /usr/bin/xargs -0 /usr/bin/sha1sum | /usr/bin/sha1sum", "useshell");
-      "ncf_local_sha_sum"  string => execresult("${paths.path[find]} ${g.rudder_ncf_origin_local} -not -name ${g.rudder_ncf_hash_file} -type f -print0  | ${paths.path[sort]} -z | /usr/bin/xargs -0 /usr/bin/sha1sum | /usr/bin/sha1sum", "useshell");
+      "ncf_sha_sum" string => execresult("${paths.path[find]} ${g.rudder_ncf} -not -name ${g.rudder_ncf_hash_file} -type f -print0  | ${paths.path[sort]} -z | /usr/bin/xargs -0 /usr/bin/sha1sum | /usr/bin/sha1sum", "useshell");
 
     rudder_tools_updated_exists::
       "tools_timestamp"   string => readfile("${g.rudder_tools_updated_origin}", 2048);
@@ -60,7 +59,7 @@ bundle agent propagatePromises
         comment => "Fetching the tools for the promises execution",
         classes => classes_generic("propagate_tools");
 
-      "${g.rudder_ncf_origin_local}/ncf.conf"
+      "${g.rudder_ncf_local}/ncf.conf"
         copy_from    => copy_digest("${sys.workdir}/inputs/distributePolicy/ncf/ncf.conf"),
         comment      => "Enforce the ncf configuration file",
         classes      => classes_generic("configure_ncf_config");
@@ -72,18 +71,6 @@ bundle agent propagatePromises
         depth_search => recurse_visible("inf"),
         comment => "Fetching the promises to propagate",
         classes => if_else("promises_propagated", "could_not_propagate_promise");
-
-      "${g.rudder_ncf_origin_local}"
-        copy_from    => remote("${server_info.cfserved}","${g.rudder_ncf_origin_local}"),
-        depth_search => recurse_visible("inf"),
-        comment      => "Fetching the ncf local to propagate",
-        classes      => if_else("ncf_local_promises_propagated", "could_not_propagate_ncf_local_promise");
-
-      "${g.rudder_ncf_origin_common}"
-        copy_from    => remote("${server_info.cfserved}","${g.rudder_ncf_origin_common}"),
-        depth_search => recurse_visible("inf"),
-        comment      => "Fetching the ncf common to propagate",
-        classes      => if_else("ncf_common_promises_propagated", "could_not_propagate_ncf_common_promise");
 
       "&SHARED_FILES_FOLDER&"
         copy_from    => remote("${server_info.cfserved}","&SHARED_FILES_FOLDER&"),
@@ -121,21 +108,13 @@ bundle agent propagatePromises
         comment       => "Update the timestamp in the rudder tool updated file";
 
     # each run, update the hash files of ncf
-    # these hashes are used by node to know if they should update their copy of ncf
+    # these hashes are used by nodes to know if they should update their copy of ncf
     root_server.pass2::
-      "${g.rudder_ncf_origin_common_hash}"
+      "${g.rudder_ncf_hash}"
         create        => "true",
         edit_defaults => empty,
-        edit_line     => insert_lines("${ncf_common_sha_sum}"),
-        comment       => "Update the hash of ncf common";
-
-      "${g.rudder_ncf_origin_local_hash}"
-        create        => "true",
-        edit_defaults => empty,
-        edit_line     => insert_lines("${ncf_local_sha_sum}"),
-        comment       => "Update the hash of ncf local";
-
-
+        edit_line     => insert_lines("${ncf_sha_sum}"),
+        comment       => "Update the ncf hash";
 
   methods:
     root_server::
@@ -147,7 +126,7 @@ bundle agent propagatePromises
     # Success if files are updated or not changed (kept or repaired).
     # root server have only tools to be updated and others have tools,
     # promises, masterfiles folder and licenses to be updated.
-    pass3.(((root_server.propagate_tools_ok)|(!root_server.propagate_tools_ok.promises_propagated.masterfiles_propagated.ncf_local_promises_propagated.ncf_common_promises_propagated)).!(propagate_tools_error|could_not_propagate_promise|could_not_propagate_masterfiles|could_not_copy_license|could_not_propagate_ncf_local_promise|could_not_propagate_ncf_common_promise))::
+    pass3.(((root_server.propagate_tools_ok)|(!root_server.propagate_tools_ok.promises_propagated.masterfiles_propagated)).!(propagate_tools_error|could_not_propagate_promise|could_not_propagate_masterfiles|could_not_copy_license))::
       "any" usebundle => rudder_common_report("DistributePolicy", "result_success", "&TRACKINGKEY&", "Propagate promises", "None", "All files have been propagated");
     pass3.could_not_propagate_promise::
       "any" usebundle => rudder_common_report("DistributePolicy", "result_error", "&TRACKINGKEY&", "Propagate promises", "None", "Cannot propagate policy files");
@@ -157,12 +136,6 @@ bundle agent propagatePromises
 
     pass3.propagate_tools_error::
       "any" usebundle => rudder_common_report("DistributePolicy", "result_error", "&TRACKINGKEY&", "Propagate promises", "None", "Cannot propagate tools");
-
-    pass3.could_not_propagate_ncf_local_promise::
-      "any" usebundle => rudder_common_report("DistributePolicy", "result_error", "&TRACKINGKEY&", "Propagate promises", "None", "Cannot propagate local ncf promises");
-
-    pass3.could_not_propagate_ncf_common_promise::
-      "any" usebundle => rudder_common_report("DistributePolicy", "result_error", "&TRACKINGKEY&", "Propagate promises", "None", "Cannot propagate common ncf promises");
 
     pass3.could_not_propagate_masterfiles::
       "any" usebundle => rudder_common_report("DistributePolicy", "result_error", "&TRACKINGKEY&", "Propagate promises", "None", "Cannot propagate masterfiles");

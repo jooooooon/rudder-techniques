@@ -52,16 +52,12 @@ bundle server access_rules
         admit   => {  @{def.acl}  };
 
 &if(MANAGED_NODES_NAME)&
-      "${g.rudder_ncf_origin_common}"
-        maproot => {  @{def.acl}  },
-        admit   => {  @{def.acl}  };
-
-      "${g.rudder_ncf_origin_local}"
+      "${g.rudder_ncf}"
         maproot => {  @{def.acl}  },
         admit   => {  @{def.acl}  };
 
       # Deny access to 50_techniques folder
-      "${g.rudder_ncf_origin_local}/50_techniques"
+      "${g.rudder_ncf_local}/50_techniques"
         deny    => {  ".*"  };
 
       &if(SHARED_FILES_FOLDER)&
